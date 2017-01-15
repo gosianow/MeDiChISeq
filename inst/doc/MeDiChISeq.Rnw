@@ -1,0 +1,406 @@
+%\VignetteIndexEntry{MeDiChISeq Overview}
+%\VignetteKeywords{ChIP-seq, next generation sequencing, massively parallel sequencing}
+%\VignetteDepends{MeDiChISeq}
+%\VignettePackage{MeDiChISeq}
+
+\documentclass[12pt]{article}
+
+\usepackage{amsmath}
+\usepackage{times}
+\usepackage{hyperref}
+\usepackage[authoryear,round]{natbib}
+
+
+\textwidth=6.2in
+\textheight=8.5in
+%\parskip=.3cm
+\oddsidemargin=.1in
+\evensidemargin=.1in
+\headheight=-.3in
+
+\newcommand{\Rcode}[1]{{\texttt{#1}}}
+\newcommand{\Rpackage}[1]{{\textsf{#1}}}
+
+
+\bibliographystyle{plainnat}
+
+
+\title{The \Rpackage{MeDiChISeq} ChIP-seq deconvolution package}
+\author{Malgorzata Nowicka and Wouter Van Gool \\ under the direction of \\ Marco Antonio Mendoza Parra and Hinrich Gronemeyer}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+\maketitle
+
+\tableofcontents
+
+
+\section{Technical notes}
+
+\Rpackage{MeDiChISeq} package is an adaptation of previously described \Rpackage{MeDiChI}, \cite{MeDiChI}, a deconvolution package for ChIP-chip assays. \Rpackage{MeDiChISeq} has been previously used in \cite{RA} and \cite{POLYPHEMUS} in the context of ChIP-seq datasets.
+
+\subsection{Installation}
+
+Part of \Rpackage{MeDiChISeq} functions is written in C++ and integrated with \Rpackage{R} via \Rpackage{Rcpp} package. The SeqAn (integrated in this package) and Boost C++ libraries, which requires loading of \Rpackage{BH} package, are used. Additionally \Rpackage{parallel} package for parallel computation and \Rpackage{lars}, \Rpackage{quadprog} and \Rpackage{corpcor} packages are required. \Rpackage{MeDiChISeq} can be loaded as follows:
+
+<<library, eval=T>>=
+library(MeDiChISeq)
+@
+
+\subsection{Input data}
+
+The example data set used in this tutorial has been originally published by \cite{Mapping} and can be downloaded from the public repository \href{http://www.ncbi.nlm.nih.gov/geo/}{GEO} (GSM646314, GSM646332, GSM646424 and GSM646430) and from \href{http://archive.igbmc.fr/recherche/Prog_FGC/Eq_HGron/bioinfotools.html}{MeDiChiSeq website} together with the peak calling results. We illustrate how to annotate peaks in ChIP-seq profiles such as CTCF, which presents sharp binding patterns, and H3K4me3 that is characterized by broader binding islands.
+
+While in the examples illustrated in this vignette we have used BED format files as input datasets, \Rpackage{MeDiChISeq} can process mapped read files in following formats: SAM, BAM, BOWTIE, SOAP.
+
+
+\subsection{Parallelization}
+
+Due to the important computation requirements during the linear regression fitting and the bootstrapping large datasets might require several hours of processing. For this reason both \Rcode{fit.peak.profile.seq} and \Rcode{deconv.entire.genome.seq} functions can be run following a multicore mode. The parallelization schema is based on 
+\Rcode{mclapply} function from \Rpackage{parallel} package, thus users can specify the number of processors in use with the \Rcode{nr.cores} parameter (see below). 
+
+
+\subsection{Clonal reads}
+
+It can happen that the ChIP-seq datasets may contain an important fraction of sequenced reads aligned to the exactly same genomic position. Such so called clonal reads are usually considered as artefacts resulting from the PCR amplification step retrieved in most of the library construction protocols.  If this is a frequent phenomena (i.e. the fraction of clonal reads is significant relative to the total population) they can have a negative influence on the shape of peaks. That is why we suggest to remove them using the parameter \Rcode{remove.clonal.reads=TRUE}, which abrogates the clonal population, but keeps a copy of them defined by the parameter \Rcode{clonal.reads.to.keep}. 
+
+
+\section{Learning a representative binding pattern}
+
+
+\begin{figure}[!htb]
+\begin{center}
+\includegraphics[width=75mm, height=75mm]{pics/CTCF_kernel_best.png}
+\includegraphics[width=75mm, height=75mm]{pics/H3K4_kernel_best.png}
+\includegraphics[width=75mm, height=75mm]{pics/CTCF_kernel_final.png}
+\includegraphics[width=75mm, height=75mm]{pics/H3K4_kernel_final.png}
+\end{center}
+\caption{Example of highest intensity peaks used to learn the kernel shape and the final fitting for CTCF (left) and H3K4me3 (right) profiles.}
+\label{fig:Kernels}
+\end{figure}
+
+
+In the first step \Rpackage{MeDiChISeq} defines a representative binding pattern from the provided ChIP-Seq dataset. In fact, this step is justified by the fact that several technical aspects in the generation of a given ChIP-seq dataset, among them the chromatin sonication, but also the inherent nature of the factor under study (i.e. sharp versus broad binding pattern profiles) may directly influence the shape of peaks populating the ChIP-seq profile.
+
+Briefly, this is performed by fitting a binding pattern model, described here as kernel, to a reduced number of genomic regions, for instance those retrieved in a single chromosome. The formalism of this procedure is extensively described in \cite{MeDiChI}. Such kernel is used in a second step of \Rpackage{MeDiChISeq} work flow for identifying binding events genome wide.
+
+The shape of binding sites is learned with \Rcode{fit.peak.profile.seq} function. Starting with a default kernel, peaks are iteratively annotated and refitted and kernel parameters are adjusted in order to find the modeled shape that will fit the best to the observed one. We assume that in general high intensity peaks represent true binding sites, which is why refitting and learning of new parameters takes place only in such regions. The number of regions to consider can be defined with \Rcode{n.peaks} and \Rcode{n.skip} parameters. Note that the threshold (\Rcode{quant.cutoff = "q1e-7"}) for annotating putative binding regions can be more stringent than in \Rcode{deconv.entire.genome.seq} (\Rcode{quant.cutoff = "q1e-5"}) because we are interested in annotating a fraction of binding sites for learning the representative binding pattern.
+
+Currently, parameters that are optimized include the shape and scale of the Gamma function used to asses the fragment length distribution. The choice of starting parameters can influence the final fitting, thus it is important to choose the one that could be close to the expected final results. After performing multiple fittings on different profiles we suggest to use \Rcode{start.pars = c(shape = 10, scale = 30)} which correspond to the average DNA fragment length of $300$ bp.
+
+In the example below short reads are first elongated by \Rcode{reads.elong=150} bp, then the kernel fitting is performed. This elongation parameter should correspond more or less to the sonication fragment length. If we have no feeling about value to set up, we can define \Rcode{reads.elong=NULL}, then the elongation distance will be estimated from forward and reverse read profiles. This is performed as following: kernel is fitted separately to the forward and reversed intensity profiles, which are created from reads of length \Rcode{reads.length}. Then \Rcode{reads.elong} equals to $$estimated.fragment.length_{Forward} + estimated.fragment.length_{Reverse} - reads.length.$$ Nevetheless we suggest to use the first approach since it is faster and gives optimal results for most of the evaluated profiles. 
+
+This is an example of code that will find the kernel fitting to the CTCF profile, figure \ref{fig:Kernels}. 
+
+<<fit.peak.profile.seq, eval=F>>=
+file.IP <- "GSM646314_GM12878_CTCF_rep1.bed"
+
+fit.peak.profile.seq(file.IP, format="bed", genome="hg18", output.dir=NULL, 
+output.name="CTCF", chrom.fit="chr19", limL=0, limU=Inf, 
+reads.elong=150, quant.cutoff="q1e-7", window=50000, 
+mini.window=3000, wig.res=10, fit.res=50, reads.length=50, 
+n.peaks = 50, n.skip = 20, re.fit=100, max.iter=500, selection.method="bic", 
+post.proc.factor=2, start.pars = c(shape =10, scale = 30), 
+to.be.fit=c("shape", "scale"), method = "L-BFGS-B", 
+nr.cores=1, remove.clonal.reads=TRUE, clonal.reads.to.keep=3, 
+write.pdf=TRUE, save.kernel=TRUE, verbose.console=TRUE, 
+overwrite.wigs=FALSE,  keep.wigs=TRUE)
+@
+
+
+As most of the parameters can be set up to their default values, the same results can be achieved with much simpler code:
+
+<<fit.peak.profile.seq_Short, eval=F>>=
+fit.peak.profile.seq(file.IP, genome="hg18", 
+output.name="CTCF", chrom.fit="chr19",
+quant.cutoff="q1e-7", window=50000, mini.window=3000,
+start.pars = c(shape =10, scale = 30),
+method = "L-BFGS-B")
+@
+
+
+With the same settings we can find the kernel for broad H3K4me3 profile, figure \ref{fig:Kernels}. 
+
+<<fit.peak.profile.seq, eval=F>>=
+file.IP <- "GSM646424_Huvec_H3K4me3_rep1.bed"
+
+fit.peak.profile.seq(file.IP, genome="hg18", 
+output.name="H3K4me3", chrom.fit="chr19",
+quant.cutoff="q1e-7", window=50000, mini.window=3000,
+start.pars = c(shape =10, scale = 30),
+method = "L-BFGS-B")
+@
+
+
+
+The output of \Rcode{fit.peak.profile.seq} consists of the list of following objects:
+
+\begin{itemize}
+
+\item \Rcode{reads.elong}: short reads were elongated to this length in order to create the intensity WIG files on which the fitting is performed.
+
+\item \Rcode{kernel}: final peak profile.
+
+\item \Rcode{frag.length}: estimated fragment length. From the kernel model, the base of peaks corresponds to $2*$\Rcode{frag.length}.
+
+\end{itemize}
+
+      
+Moreover, if \Rcode{kernel=TRUE, verbose.console=TRUE, keep.wigs=TRUE}, than in the directory \Rcode{output.dir} all the above outputs will be saved together with generated WIG file, console display of work progress and the PDF files with progress of kernel fitting and final kernel plots. 
+
+
+
+\section{Whole genome deconvolution}
+
+In this part, we will deconvolve a small chunk of chromosome $19$ from CTCF data set. In general we can specify any genome piece of interest with parameters \Rcode{chrom.list, limL, limU, potential.peaks}. Such region is divided into overlapping windows which are further deconvolved with adjusted version of  \Rcode{chip.deconv} function from \Rpackage{MeDiChI} package. For the whole genome deconvolution set \Rcode{chrom.list=NULL, limL=0, limU=Inf, 
+potential.peaks=NULL}, which is the default. 
+
+When required the \Rcode{potential.peaks} parameter makes reference to an output in BED format from any other peak caller, for instance MACS, whose results would be validated using \Rpackage{MeDiChISeq}. Alternatively, it could be used to target \Rpackage{MeDiChISeq} analysis to different chromatin regions, for instance promoter loci, by providing their coordinates in BED format.
+
+Remember to set up \Rcode{reads.elong} to the value that had been used for elongation when the chosen kernel was produced by \Rcode{fit.peak.profile.seq} function.
+
+When \Rcode{nr.boots} $\geq 2$, for each peak global and local p-values are calculated. Using \Rcode{local.windows} parameter define the number and the size of areas surrounding each peak that we consider in calculations of local confidence. Final p-values are a combination of all local and global p-values. 
+
+In this example we also introduce the control sample which is deconvolved in parallel with IP and used for correcting the confidence of peaks in case when the control sample presents enriched patterns in the same chromatin loci. Parameter \Rcode{Control.corr.param} defines the minimal percentage of overlap between peaks from IP and control to consider them in the same loci and apply correction. 
+
+When \Rcode{verbose.console=TRUE} we can follow progress of deconvolution. 
+
+<<deconv.all, eval=F>>=
+file.IP <-  "GSM646314_GM12878_CTCF_rep1.bed"
+file.Control <-  "GSM646332_GM12878_WCE_rep1.bed"
+
+reads.elong <- "MeDiChISeq_CTCF_reads.elong.txt"
+kernel <- "MeDiChISeq_CTCF_kernel.txt"
+frag.length <- "MeDiChISeq_CTCF_frag_length.txt"
+
+
+deconv.entire.genome.seq(file.IP, file.Control=file.Control, format="bed", 
+genome="hg18", output.dir=NULL, output.name="CTCF", 
+chrom.list=NULL, limL=0, limU=Inf, potential.peaks=NULL, 
+reads.elong=150, kernel=kernel, frag.length=frag.length, 
+quant.cutoff="q1e-5", window=20000, wig.res=10, 
+fit.res=50, max.steps=100, selection.method="bic", 
+post.proc.factor=2, nr.boots=5, 
+local.windows=c(1000, 2000, 5000), Control.corr.param=0.01, 
+nr.cores=1, remove.clonal.reads=F, clonal.reads.to.keep=3, 
+verbose.console=TRUE, overwrite.wigs=FALSE, keep.wigs=TRUE)
+@
+
+Most of the parameters are set up to their default values and above run is equivalent to the followig one:
+
+<<deconv.all.short, eval=F>>=
+deconv.entire.genome.seq(file.IP, file.Control=file.Control, 
+genome="hg18", output.name="CTCF",
+window=20000,
+reads.elong=reads.elong, kernel=kernel, 
+frag.length=frag.length,
+nr.cores=1, remove.clonal.reads=F)
+@
+
+For profiles with broad patterns we suggest to use a bigger \Rcode{window=50000} in order to properly estimate the background which can not be "caught" when the window is too small.
+
+
+<<deconv.all, eval=F>>=
+file.IP <-  "GSM646424_Huvec_H3K4me3_rep1.bed"
+file.Control <-  "GSM646430_Huvec_WCE_rep1.bed"
+
+reads.elong <- "MeDiChISeq_H3K4me3_reads.elong.txt"
+kernel <- "MeDiChISeq_H3K4me3_kernel.txt"
+frag.length <- "MeDiChISeq_H3K4me3_frag_length.txt"
+
+deconv.entire.genome.seq(file.IP, file.Control=file.Control, 
+genome="hg18", output.name="H3K4me3",
+window=50000, 
+reads.elong=reads.elong, kernel=kernel, 
+frag.length=frag.length,
+nr.cores=1, remove.clonal.reads=F)
+@
+
+Generated output consists of the following object:
+
+\begin{itemize}
+
+\item \Rcode{All.coeffs.IP} that contains a list of all annotated peaks with their intensities, global, local and combined p-values and coefficients after control correction.
+
+\end{itemize}
+
+<<all.coeffs, eval=F>>=
+out.CTCF <- read.table("MeDiChISeq_CTCF_ALL_COEFFS_IP.txt", head=T)
+@
+
+<<all.coeffs, eval=T, echo=FALSE>>=
+dir <- system.file("extdata/CTCF", package="MeDiChISeq")
+out.CTCF <- read.table(file.path(dir, "MeDiChISeq_CTCF_ALL_COEFFS_IP_rcd.txt"), head=T)
+@
+
+
+<<all.coeffs, eval=T>>=
+head(out.CTCF)
+@
+
+
+This object is saved in \Rcode{output.dir}. Moreover you can find there a BED file with annotated peaks and their intensities and WIG files which can be loaded to any genome browser for visual verification of obtained results. In order to facilitate the choice of p-values cutoff a plot of intensities versus p-values is generated, for more details go to section \ref{sec:threshold}. The console output of \Rcode{deconv.entire.genome.seq} is also saved. 
+
+
+\section{Single window deconvolution}
+
+\begin{figure}[!htb]
+\begin{center}
+\includegraphics[width=75mm, height=75mm]{pics/medichi_deconv_CTCF.png}
+\includegraphics[width=75mm, height=75mm]{pics/medichi_deconv_H3K4me3.png}
+\includegraphics[width=75mm, height=75mm]{pics/medichi_deconv_CTCF_zoom.png}
+\includegraphics[width=75mm, height=75mm]{pics/medichi_deconv_H3K4me3_zoom.png}
+\end{center}
+\caption{Single window deconvolution of CTCF (left) and H3K4me3 (right) profiles. Top panels present the results for the entire window. Bottom panels are zoomed on one of the deconvolved regiones.}
+\label{fig:medichi_deconv}
+\end{figure}
+
+
+
+Here we present the use of the core function \Rcode{chip.deconv.seq} which deconvolves the subset of ChIP-seq intensity profile and allows to get a visual representation of deconvolution in a given window, see figure \ref{fig:medichi_deconv}. This function and its adjusted version are the slight modifications of \Rcode{chip.deconv} designed by \citep{MeDiChI}. 
+
+
+\Rcode{chip.deconv.seq} works over any WIG intensity file that can be generated with \Rcode{write.wigs.parallel} function. 
+
+Deconvolution of one (centered in $461582$) of the windows produced by \Rcode{deconv.entire.genome.seq} for CTCF - sharp pattern profile. 
+
+
+<<deconv.piece, eval=T, echo=FALSE>>=
+dir <- system.file("extdata/CTCF", package="MeDiChISeq")
+data <- read.table(file.path(dir, "chr19_IP_GSM646314_GM12878_CTCF_rep1_rcd_res-10_dist-150_both.wig"), 
+                   skip=2)
+kernel <- read.table(file.path(dir, "MeDiChISeq_CTCF_kernel.txt"))
+@
+
+
+<<deconv.piece, eval=F>>=
+data <- read.table("chr19_IP_GSM646314_GM12878_CTCF_rep1_res-10_dist-150_both.wig", 
+                   skip=2)
+kernel <- read.table("MeDiChISeq_CTCF_kernel.txt")
+@
+
+
+<<deconv.piece, eval=T>>=
+out <- chip.deconv.seq(data = data, center = 461582, window = 20000, 
+kernel = kernel, quant.cutoff = "q1e-5", fit.res = 50) 
+
+coef(out)
+@
+
+
+
+<<deconv.piece.fig, eval=F, echo=FALSE>>=
+png( "pics/medichi_deconv_CTCF.png")
+@
+
+<<deconv.piece.fig, eval=F, echo=T>>=
+plot(out)
+@
+
+<<deconv.piece.fig, eval=F, echo=FALSE>>=
+dev.off()
+@
+
+
+
+<<deconv.piece.fig, eval=F, echo=FALSE>>=
+png( "pics/medichi_deconv_CTCF_zoom.png")
+@
+
+<<deconv.piece.fig, eval=F, echo=T>>=
+plot(out, center=457891, window=3000)
+@
+
+<<deconv.piece.fig, eval=F, echo=FALSE>>=
+dev.off()
+@
+
+
+
+
+Deconvolution of one (centered in $469384$) of the windows produced by \Rcode{deconv.entire.genome.seq} for H3K4me3 - broad pattern profile. 
+
+
+<<deconv.piece, eval=T, echo=FALSE>>=
+dir <- system.file("extdata/H3K4me3", package="MeDiChISeq")
+data <- read.table(file.path(dir, "chr19_IP_GSM646424_Huvec_H3K4me3_rep1_rcd_res-10_dist-150_both.wig"), 
+                   skip=2)
+kernel <- read.table(file.path(dir, "MeDiChISeq_H3K4me3_kernel.txt"))
+@
+
+
+<<deconv.piece, eval=F>>=
+data <- read.table("chr19_IP_GSM646424_Huvec_H3K4me3_rep1_res-10_dist-150_both.wig", 
+                   skip=2)
+kernel <- read.table("MeDiChISeq_H3K4me3_kernel.txt")
+@
+
+
+<<deconv.piece, eval=T>>=
+out <- chip.deconv.seq(data = data, center = 469384, window = 50000, 
+kernel = kernel, quant.cutoff = "q1e-5", fit.res = 50) 
+
+coef(out)
+@
+
+<<deconv.piece.fig, eval=F, echo=T>>=
+plot(out)
+@
+
+<<deconv.piece.fig, eval=F, echo=T>>=
+plot(out, center=483241, window=5000)
+@
+
+
+
+<<deconv.piece.fig, eval=F, echo=FALSE>>=
+png( "pics/medichi_deconv_H3K4me3.png")
+
+plot(out)
+
+dev.off()
+@
+
+
+<<deconv.piece.fig, eval=F, echo=FALSE>>=
+png( "pics/medichi_deconv_H3K4me3_zoom.png")
+
+plot(out, center=483241, window=5000)
+
+dev.off()
+@
+
+
+
+\section{Choosing an appropriate threshold}
+\label{sec:threshold}
+
+\begin{figure}[!htb]
+\begin{center}
+\includegraphics[width=75mm, height=75mm]{pics/CTCF_pvsVSint.png}
+\includegraphics[width=75mm, height=75mm]{pics/H3K4_pvsVSint.png}
+\end{center}
+\caption{Logarithm of intensity versus negative logarithm of combined local and global p-values of putative peaks for CTCF (left) and H3K4me3 (right) profiles.}
+\label{fig:threshold}
+\end{figure}
+
+
+At this stage an output of \Rcode{deconv.entire.genome.seq} consists of a list of all putative peaks even those with low confidence and final elimination of those false positives should be applied. On the zoomed deconvolution window for CTCF (figure \ref{fig:medichi_deconv}, lower panel) we can see that two peaks were called including one (position $458091$) with very low intensity ($6.271881$) which is a result of overfitting and looks rather like a shoulder of the peak annotated in position $457891$. As shown further this low intensity peak gets higher p-value ($6.767360e-03$) and its control correction coefficient, defined as 
+$$-\log10(combined.local.global.p.values_{IP})\times \log10(intensity_{IP}) -$$ 
+$$(-\log10(combined.local.global.p.values_{Control}) \times  \log10(intensity_{Control})),$$ 
+is much smaller ($13.60735$) than for the "real" peaks.
+
+One can also use scatterplots of p-values versus intensity(figure \ref{fig:threshold}) in order to see the distribution of those values in a given profile and choose an adequate cutoff. In the illustrated scatterplot points, which correspond to annotated binding sites, follow an S-shape distribution. This distribution is a consequence of the presence of three kinds of peaks: those with low confidence that have intensity comparable with the background; sites presenting a correlative increase between intensity and confidence and a small subset of peaks for which the confidence gets constant level though their intensity increase. Based on such scatterplots we suggest to remove the low confidence population by selecting a -log10(p-value) threshold in the range of $2-3$. 
+
+
+<<threshold, eval=T>>=
+out.CTCF[out.CTCF[,"chromosome"] == "chr19" & 
+out.CTCF[,"position"] <= 461791 & out.CTCF[,"position"] >= 457891, ]
+@
+
+
+\newpage
+\bibliography{MeDiChISeq}
+
+\end{document}

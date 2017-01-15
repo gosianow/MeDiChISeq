@@ -1,0 +1,1061 @@
+// ==========================================================================
+//                 SeqAn - The Library for Sequence Analysis
+// ==========================================================================
+// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+//     * Redistributions of source code must retain the above copyright
+//       notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright
+//       notice, this list of conditions and the following disclaimer in the
+//       documentation and/or other materials provided with the distribution.
+//     * Neither the name of Knut Reinert or the FU Berlin nor the names of
+//       its contributors may be used to endorse or promote products derived
+//       from this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL KNUT REINERT OR THE FU BERLIN BE LIABLE
+// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+// LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+// OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+// DAMAGE.
+//
+// ==========================================================================
+//  This is the musketeer header ("one for all and all for one").
+// ==========================================================================
+
+
+  zlib.h -- interface of the 'zlib' general purpose compression library
+  version 1.2.3.4, December 21st, 2009
+
+  Copyright (C) 1995-2009 Jean-loup Gailly and Mark Adler
+
+  This software is provided 'as-is', without any express or implied
+  warranty.  In no event will the authors be held liable for any damages
+  arising from the use of this software.
+
+  Permission is granted to anyone to use this software for any purpose,
+  including commercial applications, and to alter it and redistribute it
+  freely, subject to the following restrictions:
+
+  1. The origin of this software must not be misrepresented; you must not
+     claim that you wrote the original software. If you use this software
+     in a product, an acknowledgment in the product documentation would be
+     appreciated but is not required.
+  2. Altered source versions must be plainly marked as such, and must not be
+     misrepresented as being the original software.
+  3. This notice may not be removed or altered from any source distribution.
+
+  Jean-loup Gailly        Mark Adler
+  jloup@gzip.org          madler@alumni.caltech.edu
+
+
+  The data format used by the zlib library is described by RFCs (Request for
+  Comments) 1950 to 1952 in the files http://www.ietf.org/rfc/rfc1950.txt
+  (zlib format), rfc1951.txt (deflate format) and rfc1952.txt (gzip format).
+
+// ==========================================================================
+// list of Copyrights authors for the SeqAn libraries 
+// ==========================================================================
+
+seqan/align/align_base.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/align_cols.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/align_config.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/align_iterator_base.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/align_metafunctions.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/align_traceback.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/alignment_algorithm_interface.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/alignment_algorithm_tags.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/alignment_operations.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/gap_anchor.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/gapped_value_type.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/gaps_anchor.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/gaps_array.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/gaps_base.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/gaps_iterator_anchor.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/gaps_iterator_array.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/gaps_iterator_base.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/global_alignment_banded.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/global_alignment_banded_gotoh_impl.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/global_alignment_banded_needleman_wunsch_impl.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/global_alignment_gotoh_impl.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/global_alignment_hirschberg_impl.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/global_alignment_myers_hirschberg_impl.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/global_alignment_myers_impl.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/global_alignment_needleman_wunsch_impl.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/global_alignment_specialized.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/global_alignment_unbanded.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/INFO:Copyright: 2008-2012, Knut Reinert, FU Berlin
+seqan/align/local_alignment_banded.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/local_alignment_banded_waterman_eggert_impl.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/local_alignment_enumeration.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/local_alignment_enumeration_banded.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/local_alignment_enumeration_unbanded.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/local_alignment_smith_waterman_impl.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/local_alignment_unbanded.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/local_alignment_waterman_eggert_impl.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align/matrix_base.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/align.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/arg_parse/arg_parse_argument.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/arg_parse/arg_parse_ctd_support.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/arg_parse/arg_parse_doc.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/arg_parse/arg_parse_exceptions.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/arg_parse/arg_parse_option.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/arg_parse/arg_parse_parse.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/arg_parse/arg_parse_type_support.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/arg_parse/argument_parser.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/arg_parse/INFO:Copyright: 2008-2012, FU Berlin
+seqan/arg_parse/tool_doc.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/arg_parse/xml_support.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/arg_parse.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/bam_io/bam_alignment_record.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/bam_io/bam_alignment_record_util.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/bam_io/bam_header_record.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/bam_io/bam_index_bai.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/bam_io/bam_index_bai.h:   Copyright (c) 2008-2009 Genome Research Ltd.
+seqan/bam_io/bam_index_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/bam_io/bam_io_context.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/bam_io/bam_reader.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/bam_io/bam_sam_conversion.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/bam_io/bam_stream.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/bam_io/bam_tags_dict.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/bam_io/bam_writer.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/bam_io/INFO:Copyright: 2008-2011, FU Berlin
+seqan/bam_io/read_bam.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/bam_io/read_sam.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/bam_io/sam_reader.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/bam_io/sam_writer.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/bam_io/write_bam.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/bam_io/write_sam.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/bam_io/xam_reader.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/bam_io/xam_writer.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/bam_io.h:// Copyright (c) 2006-2011, Knut Reinert, FU Berlin
+seqan/basic/aggregate_concept.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/allocator_chunkpool.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/allocator_interface.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/allocator_multipool.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/allocator_simple.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/allocator_singlepool.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/allocator_to_std.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/alphabet_adapt_builtins.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/alphabet_bio.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/alphabet_concept.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/alphabet_math.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/alphabet_profile.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/alphabet_qualities.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/alphabet_residue.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/alphabet_residue_tabs.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/alphabet_simple_type.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/alphabet_storage.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/array_construct_destruct.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/basic_aggregate.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/basic_allocator.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/basic_alphabet.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/basic_concept.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/basic_container.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/basic_debug.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/basic_fundamental.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/basic_iterator.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/basic_math.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/basic_metaprogramming.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/basic_parallelism.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/basic_proxy.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/basic_smart_pointer.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/basic_tangle.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/basic/basic_type.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/boost_preprocessor_subset.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/boost_preprocessor_subset.h:#  *     (C) Copyright Paul Mensonides 2002.
+seqan/basic/boost_preprocessor_subset.h://  Copyright (c) 2001-2003 John Maddock
+seqan/basic/boost_preprocessor_subset.h://  Copyright (c) 2001 Darin Adler
+seqan/basic/boost_preprocessor_subset.h://  Copyright (c) 2001 Peter Dimov
+seqan/basic/boost_preprocessor_subset.h://  Copyright (c) 2002 Bill Kempf 
+seqan/basic/boost_preprocessor_subset.h://  Copyright (c) 2002 Jens Maurer
+seqan/basic/boost_preprocessor_subset.h://  Copyright (c) 2002-2003 David Abrahams
+seqan/basic/boost_preprocessor_subset.h://  Copyright (c) 2003 Gennaro Prota
+seqan/basic/boost_preprocessor_subset.h://  Copyright (c) 2003 Eric Friedman
+seqan/basic/boost_preprocessor_subset.h://  Copyright (c) 2010 Eric Jourdanneau, Joel Falcou
+seqan/basic/builtin_functions.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/concept_checking.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/concept_checking.h://  (C) Copyright John Maddock 2000.
+seqan/basic/concept_checking.h:// Copyright David Abrahams 2006. Distributed under the Boost Software
+seqan/basic/concept_checking.h:// (C) Copyright Jeremy Siek 2000.
+seqan/basic/concept_checking.h:// Copyright 2002 The Trustees of Indiana University.
+seqan/basic/concept_checking.h:// Copyright David Abrahams 2006. Distributed under the Boost
+seqan/basic/container_concept.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/debug_helper.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/debug_test_system.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/fundamental_comparison.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/fundamental_concepts.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/fundamental_concepts.h:// (C) Copyright Jeremy Siek 2000.
+seqan/basic/fundamental_concepts.h:// Copyright 2002 The Trustees of Indiana University.
+seqan/basic/fundamental_conversion.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/fundamental_metafunctions.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/fundamental_tags.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/fundamental_transport.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/holder_base.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/holder_simple.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/holder_tristate.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/hosted_type_interface.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/INFO:Copyright: 2008-2011, FU Berlin
+seqan/basic/iterator_adapt_pointer.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/basic/iterator_adapt_std.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/iterator_adaptor.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/iterator_base.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/iterator_concept.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/iterator_interface.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/iterator_position.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/macro_deprecated.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/math_functions.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/math_log_space_value.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/metaprogramming_control.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/metaprogramming_enable_if.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/metaprogramming_logic.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/metaprogramming_math.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/metaprogramming_type.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/pair_base.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/pair_bit_compressed.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/pair_packed.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/profiling.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/proxy_base.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/proxy_iterator.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/triple_base.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/triple_packed.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/tuple_base.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/tuple_bit_compressed.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic/volatile_ptr.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/basic.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+seqan/chaining/chain_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/chain_generic.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/chain_meta_fragment.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/chain_point.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/chain_wrapper_point.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/fragment.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/geom_distribution.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/INFO:Copyright: 2008-2011, FU Berlin
+seqan/chaining/range_max_tree.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/range_tree.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/rmt_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/rmt_common_algos.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/rmt_compl_algos.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/rmt_def_algos.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/rmt_skip_base_element.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/rmt_skip_element.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/rt_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/rt_common_algos.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/rt_impl.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/rt_skip_base_element.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/rt_skip_element.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/rt_sl_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/rt_sl_compl_algos.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/rt_sl_def_algos.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/rt_sl_impl.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/score_chain.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/score_chain_sop.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/score_manhattan.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/score_zero.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/skip_base_element.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/skip_element.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/skip_list.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/skip_list_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/skip_list_dynamic.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/skip_list_impl.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/skip_list_iterator.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/skip_list_type.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/skip_pool_alloc.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/chaining/tree_chain.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/chaining/tree_chain_sop.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/chaining/tree_chain_utils.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/chaining.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/consensus/consensus_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/consensus/consensus_library.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/consensus/consensus_realign.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/consensus/consensus_score.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/consensus/INFO:Copyright: 2008-2011, FU Berlin
+seqan/consensus.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/file/chunk_collector.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/file/cstream.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/file/file_array.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/file/file_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/file/file_cstyle.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/file/file_filereader.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/file/file_filereaderiterator.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/file/file_format.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/file/file_format_cgviz.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/file/file_format_embl.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/file/file_format_fasta.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/file/file_format_fasta_align.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/file/file_format_genbank.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/file/file_format_guess.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/file/file_format_mmap.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/file/file_format_raw.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/file/file_forwards.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/file/file_interface.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+
+seqan/file/file_page.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/file/file_page_raid0.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/file/INFO:Copyright: 2008-2011, FU Berlin
+seqan/file/meta.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/file/stream.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/file/stream_algorithms.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/file/string_external.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/file/string_mmap.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/file.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/find/find_abndm.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/find/find_ahocorasick.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/find/find_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/find/find_begin.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/find/find_bndm.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/find/find_bom.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/find/find_hamming_simple.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/find/find_horspool.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/find/find_multi.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/find/find_multiple_bfam.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/find/find_multiple_shiftand.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/find/find_myers_ukkonen.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/find/find_pattern_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/find/find_pex.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/find/find_score.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/find/find_set_horspool.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/find/find_shiftand.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/find/find_shiftor.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/find/find_simple.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/find/find_wild_shiftand.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/find/find_wumanber.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/find/INFO:Copyright: 2008-2011, FU Berlin
+seqan/find.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_algorithms/graph_algorithm.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_algorithms/graph_algorithm_heap_tree.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_algorithms/graph_algorithm_hmm.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_algorithms/graph_algorithm_lis_his.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_algorithms/INFO:Copyright: 2008-2011, FU Berlin
+seqan/graph_algorithms.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_msa/graph_align_tcoffee_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_msa/graph_align_tcoffee_distance.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_msa/graph_align_tcoffee_guidetree.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_msa/graph_align_tcoffee_io.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_msa/graph_align_tcoffee_kmer.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_msa/graph_align_tcoffee_library.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_msa/graph_align_tcoffee_msa.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_msa/graph_align_tcoffee_progressive.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_msa/graph_align_tcoffee_refinement.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_msa/INFO:Copyright: 2008-2011, FU Berlin
+seqan/graph_msa.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_types/graph_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_types/graph_drawing.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_types/graph_edgestump.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_types/graph_idmanager.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_types/graph_impl_automaton.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_types/graph_impl_directed.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_types/graph_impl_fragment.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_types/graph_impl_hmm.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_types/graph_impl_oracle.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_types/graph_impl_tree.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_types/graph_impl_trie.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_types/graph_impl_undirected.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_types/graph_impl_wordgraph.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_types/graph_interface.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_types/graph_iterator.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_types/graph_iterator_adjacency.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_types/graph_iterator_bfs.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_types/graph_iterator_dfs.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_types/graph_iterator_edge.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_types/graph_iterator_outedge.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_types/graph_iterator_vertex.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_types/graph_property.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_types/graph_utility_parsing.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/graph_types/INFO:Copyright: 2008-2011, FU Berlin
+seqan/graph_types.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/find_index.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/find_index_approx.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/find_index_esa.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/find_index_qgram.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/find_pigeonhole.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/find_quasar.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/find_swift.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/index_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/index_bwt.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/index_childtab.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/index_dfi.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/index_esa_algs.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/index_esa_algs_multi.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/index_esa_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/index_esa_drawing.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/index_esa_stree.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/index_forwards.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/index_lcp.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/index_lcp_tree.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/index_pizzachili.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/index_pizzachili_find.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/index_pizzachili_string.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/index_qgram.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/index_qgram_openaddressing.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/index_sa_btree.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/index_sa_bwtwalk.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/index_sa_lss.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/index_sa_lss.h:   Copyright 1999, N. Jesper Larsson, all rights reserved.
+seqan/index/index_sa_mm.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/index_sa_qsort.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/index_shawarma.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/index_shims.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/index_skew3.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/index_skew7.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/index_skew7_multi.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/index_wotd.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/INFO:Copyright: 2008-2011, FU Berlin
+seqan/index/pipe_merger3.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/pipe_merger7.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/pizzachili_api.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/pump_extender3.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/pump_extender7.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/pump_lcp_core.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/pump_separator7.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/radix.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/repeat_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/shape_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/shape_gapped.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/shape_onegapped.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/shape_predefined.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index/shape_threshold.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/index.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/LICENSE:Copyright (c) 2006-2011, Knut Reinert, FU Berlin
+
+seqan/map/INFO:Copyright: 2008-2011, FU Berlin
+seqan/map/map_adapter_stl.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/map/map_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/map/map_chooser.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/map/map_skiplist.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/map/map_vector.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/map/sumlist.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/map/sumlist_mini.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/map/sumlist_skip.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/map.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/misc/cmdparser/cmdoption.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+
+seqan/misc/cmdparser/cmdparser.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+
+seqan/misc/cmdparser/cmdparser_ctd_support.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+
+seqan/misc/cmdparser/cmdparser_parse.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+
+seqan/misc/cmdparser/cmdparser_type_support.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+
+seqan/misc/cmdparser/INFO:Copyright: 2008-2012, FU Berlin
+seqan/misc/edit_environment.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/misc/INFO:Copyright: 2008-2011, FU Berlin
+seqan/misc/misc_accumulators.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/misc/misc_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/misc/misc_bit_twiddling.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/misc/misc_cmdparser.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+
+seqan/misc/misc_dequeue.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/misc/misc_interval_tree.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/misc/misc_long_word.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/misc/misc_map.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/misc/misc_memset.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/misc/misc_parsing.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/misc/misc_random.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/misc/misc_set.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/misc/misc_sse2.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/misc/misc_svg.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/misc/misc_terminal.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+
+seqan/misc/misc_union_find.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/misc/priority_type_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/misc/priority_type_heap.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/modifier/INFO:Copyright: 2008-2011, FU Berlin
+seqan/modifier/modifier_alphabet.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/modifier/modifier_alphabet_expansion.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/modifier/modifier_functors.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/modifier/modifier_iterator.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/modifier/modifier_reverse.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/modifier/modifier_shortcuts.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/modifier/modifier_string.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/modifier/modifier_view.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/modifier.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/parallel/INFO:Copyright: 2008-2011, FU Berlin
+seqan/parallel/parallel_atomic_misc.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/parallel/parallel_atomic_primitives.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/parallel/parallel_macros.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/parallel/parallel_splitting.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/parallel.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/pipe/INFO:Copyright: 2008-2011, FU Berlin
+seqan/pipe/pipe_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/pipe/pipe_caster.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/pipe/pipe_counter.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/pipe/pipe_echoer.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/pipe/pipe_edit_environment.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/pipe/pipe_filter.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/pipe/pipe_iterator.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/pipe/pipe_joiner.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/pipe/pipe_namer.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/pipe/pipe_sampler.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/pipe/pipe_shifter.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/pipe/pipe_source.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/pipe/pipe_tupler.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/pipe/pool_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/pipe/pool_mapper.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/pipe/pool_sorter.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/pipe.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/platform/INFO:Copyright: 2008-2011, FU Berlin
+seqan/platform/platform_gcc.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/platform/platform_icc.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/platform/platform_mingw.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/platform/platform_pgi.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/platform/platform_solaris.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/platform/platform_windows.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/platform/windows_stdint.h://  Copyright (c) 2006-2008 Alexander Chemeris
+
+seqan/platform.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/random/ext_MersenneTwister.h:// Copyright (C) 1997 - 2002, Makoto Matsumoto and Takuji Nishimura,
+seqan/random/ext_MersenneTwister.h:// Copyright (C) 2000 - 2009, Richard J. Wagner
+
+seqan/random/INFO:Copyright: 2008-2011, FU Berlin
+seqan/random/random_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/random/random_geometric.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/random/random_lognormal.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/random/random_mt19937.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/random/random_normal.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/random/random_rng_functor.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/random/random_shuffle.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/random/random_uniform.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/random.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/refinement/graph_algorithm_refine_align.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/refinement/graph_algorithm_refine_aligngraph.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/refinement/graph_algorithm_refine_annotation.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/refinement/graph_algorithm_refine_exact.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/refinement/graph_algorithm_refine_exact_iterative.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/refinement/graph_algorithm_refine_fragment.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/refinement/graph_algorithm_refine_inexact.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/refinement/graph_algorithm_refine_scoring.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/refinement/graph_impl_align.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/refinement/graph_impl_align_adapt.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/refinement/INFO:Copyright: 2008-2011, FU Berlin
+seqan/refinement.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/score/INFO:Copyright: 2008-2011, FU Berlin
+seqan/score/score_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/score/score_edit.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/score/score_matrix.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/score/score_matrix_data.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/score/score_matrix_io.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+
+seqan/score/score_simple.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/score.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds/banded_align.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds/banded_chain_align.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds/banded_chain_align_affine.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+seqan/seeds/global_seed_chain.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds/INFO:Copyright: 2008-2011, FU Berlin
+seqan/seeds/memoryManager_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds/memoryManager_int.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds/propertyMap.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds/seed_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds/seed_multi.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds/seedHandlingTags.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds/seedSet_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds/seedSet_iterator.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds/seedSet_score.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds2/align_chain_banded.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds2/align_dynprog_affine.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds2/align_dynprog_banded_affine.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds2/align_dynprog_banded_linear.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds2/align_dynprog_linear.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds2/basic_iter_indirect.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds2/INFO:Copyright: 2008-2011, FU Berlin
+seqan/seeds2/seeds_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds2/seeds_combination.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds2/seeds_extension.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds2/seeds_global_chaining.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds2/seeds_global_chaining_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds2/seeds_global_chaining_gusfield.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds2/seeds_seed_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds2/seeds_seed_chained.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds2/seeds_seed_diagonal.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds2/seeds_seed_set_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds2/seeds_seed_set_non_scored.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds2/seeds_seed_set_scored.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds2/seeds_seed_set_unordered.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds2/seeds_seed_simple.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seeds2.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seq_io/fai_index.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+
+seqan/seq_io/genomic_region.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+
+seqan/seq_io/guess_stream_format.h:// Copyright (c) 2006-2011, Knut Reinert, FU Berlin
+
+seqan/seq_io/INFO:Copyright: 2008-2012, FU Berlin
+seqan/seq_io/read_embl.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seq_io/read_fasta_fastq.h:// Copyright (c) 2006-2011, Knut Reinert, FU Berlin
+
+seqan/seq_io/read_genbank.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/seq_io/sequence_stream.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+
+seqan/seq_io/sequence_stream_impl.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+
+seqan/seq_io/simple_read_fasta.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+
+seqan/seq_io/write_fasta_fastq.h:// Copyright (c) 2006-2011, Knut Reinert, FU Berlin
+
+seqan/seq_io.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+
+seqan/sequence/adapt_array_pointer.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence/adapt_std_list.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence/adapt_std_string.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence/adapt_std_vector.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence/INFO:Copyright: 2008-2011, FU Berlin
+seqan/sequence/iter_concat_virtual.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence/segment_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence/segment_infix.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence/segment_prefix.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence/segment_suffix.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence/segment_utils.h:// Copyright (c) 2006-2012, Knut Reinert, FU Berlin
+
+seqan/sequence/sequence_concatenator.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence/sequence_forwards.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence/sequence_interface.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence/sequence_lexical.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence/sequence_shortcuts.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence/string_alloc.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence/string_array.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence/string_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence/string_block.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence/string_cstyle.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence/string_packed.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence/string_set_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence/string_set_concat_direct.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence/string_set_dependent_generous.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence/string_set_dependent_tight.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence/string_set_owner.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence_journaled/INFO:Copyright: 2008-2011, FU Berlin
+seqan/sequence_journaled/journal_entries_sorted_array.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence_journaled/journal_entries_unbalanced_tree.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence_journaled/journal_entries_unbalanced_tree_iterator.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence_journaled/journal_entries_unbalanced_tree_node.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence_journaled/journal_entry.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence_journaled/sequence_journaled.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence_journaled/sequence_journaled_iterator.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/sequence_journaled.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/store/INFO:Copyright: 2008-2011, FU Berlin
+seqan/store/store_align.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/store/store_align_intervals.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/store/store_all.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/store/store_annotation.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/store/store_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/store/store_contig.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/store/store_intervaltree.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/store/store_io.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/store/store_io_bam.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/store/store_io_gff.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/store/store_io_sam.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/store/store_io_ucsc.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/store/store_library.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/store/store_matepair.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/store/store_read.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/store.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/stream/adapt_cstdio.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/stream/adapt_fstream.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/stream/adapt_iostream.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/stream/adapt_mmap.h:// Copyright (c) 2006-2011, Knut Reinert, FU Berlin
+
+seqan/stream/adapt_sstream.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/stream/concept_stream.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+s
+seqan/stream/INFO:Copyright: 2011, Knut Reinert, FU Berlin
+seqan/stream/is.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/stream/lexical_cast.h:// Copyright (c) 2006-2011, Knut Reinert, FU Berlin
+
+seqan/stream/read.h:// Copyright (c) 2006-2011, Knut Reinert, FU Berlin
+
+seqan/stream/read_auto_format.h:// Copyright (c) 2006-2011, Knut Reinert, FU Berlin
+
+seqan/stream/read_sam.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/stream/record_reader_base.h:// Copyright (c) 2006-2011, Knut Reinert, FU Berlin
+
+seqan/stream/record_reader_double.h:// Copyright (c) 2006-2011, Knut Reinert, FU Berlin
+
+seqan/stream/record_reader_double_mmap.h:// Copyright (c) 2006-2011, Knut Reinert, FU Berlin
+
+seqan/stream/record_reader_single.h:// Copyright (c) 2006-2011, Knut Reinert, FU Berlin
+
+seqan/stream/record_reader_single_mmap.h:// Copyright (c) 2006-2011, Knut Reinert, FU Berlin
+
+seqan/stream/stream_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/stream/stream_bgzf.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/stream/stream_bgzf.h:   Copyright (c) 2008 Broad Institute / Massachusetts Institute of Technology
+
+seqan/stream/stream_bz2_file.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/stream/stream_char_array.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/stream/stream_gz_file.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/stream/tokenize.h:// Copyright (c) 2006-2011, Knut Reinert, FU Berlin
+
+seqan/stream/write.h:// Copyright (c) 2006-2011, Knut Reinert, FU Berlin
+
+seqan/stream.h:// Copyright (c) 2006-2011, Knut Reinert, FU Berlin
+
+seqan/system/file_async.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/system/file_directory.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/system/file_forwards.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/system/file_sync.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/system/INFO:Copyright: 2008-2011, FU Berlin
+seqan/system/system_base.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/system/system_event.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/system/system_forwards.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/system/system_mutex.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/system/system_sema.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/system/system_thread.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/system.h:// Copyright (c) 2006-2010, Knut Reinert, FU Berlin
+
+seqan/version.h:// Copyright (c) 2006-2011, Knut Reinert, FU Berlin
+
+
